@@ -1,0 +1,64 @@
+### Get all books
+GET http://localhost:3000/books
+
+### Get a book by ID
+GET http://localhost:3000/books/:id
+
+
+
+
+### Add a new book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "genre": "Fiction",
+  "publishedYear": 1925,
+  "ISBN": "9780743273565",
+  "price": 10.99,
+  "stock": 50
+}
+
+### Update a book
+PUT http://localhost:3000/books/:id
+Content-Type: application/json
+
+{
+  "price": 12.99,
+  "stock": 45
+}
+### Delete a book
+DELETE http://localhost:3000/books/:id
+
+///////////////////////////////////////////////////////////////
+
+### Get all authors
+GET http://localhost:3000/authors
+
+
+### Get an author by ID
+GET http://localhost:3000/authors/:id
+
+### Create a new author
+POST http://localhost:3000/authors
+Content-Type: application/json
+
+{
+  "name": "F. Scott Fitzgerald",
+  "nationality": "American",
+  "birthYear": 1896,
+  "books": ["6794d1f07cf47a29d00fbd89"]
+}
+
+### Update an author
+PUT http://localhost:3000/authors/:id
+Content-Type: application/json
+
+{
+  "nationality": "Scottish"
+}
+
+### Delete an author
+DELETE http://localhost:3000/authors/:id

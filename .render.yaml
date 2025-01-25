@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: cse341.002
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
