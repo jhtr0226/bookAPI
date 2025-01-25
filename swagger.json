@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://cse341-002.onrender.com"
+      "url": "https://bookapi-5sj1.onrender.com"
     },
     {
       "url": "http://localhost:3000"
