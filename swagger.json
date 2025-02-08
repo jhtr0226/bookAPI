@@ -13,6 +13,27 @@
       "url": "http://localhost:3000"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "githubOAuth": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://github.com/login/oauth/authorize",
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "scopes": {
+              "user:email": "Access user email"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "githubOAuth": ["user:email"]
+    }
+  ],
   "paths": {
     "/books": {
       "get": {
