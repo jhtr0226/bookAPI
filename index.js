@@ -22,17 +22,17 @@ const host = process.env.HOST || 'localhost';
 app.use(express.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "supersecret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false, 
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL, 
+      mongoUrl: process.env.MONGODB_URL,
       collectionName: "sessions",
     }),
     cookie: {
-      secure: process.env.RENDER === "true", 
+      secure: process.env.RENDER === "true",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
@@ -84,9 +84,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
+  console.log("Dashboard Route Hit - User:", req.user);
+
   if (!req.isAuthenticated()) {
+    console.log("User not authenticated, redirecting to /");
     return res.redirect("/");
   }
+
   res.send(`<h1>Welcome, ${req.user.displayName}</h1>
     <img src="${req.user.profilePicture}" alt="Profile Picture" style="border-radius: 50px; width: 100px;">
     <p>Email: ${req.user.email}</p>

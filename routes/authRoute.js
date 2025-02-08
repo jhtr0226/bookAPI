@@ -12,13 +12,13 @@ router.get("/auth/github", (req, res, next) => {
 router.get(
   "/auth/github/callback",
   (req, res, next) => {
-    console.log("GitHub Callback Hit!");
+    console.log("GitHub Callback Hit!"); 
     next();
   },
   passport.authenticate("github", { failureRedirect: "/" }),
   (req, res) => {
-    console.log("GitHub Authentication Successful!");
-    res.redirect("/dashboard");
+    console.log("GitHub Authentication Successful!", req.user);
+    res.redirect("/dashboard"); 
   }
 );
 
