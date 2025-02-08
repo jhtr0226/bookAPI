@@ -9,7 +9,8 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL, // Ensure this is set correctly
+      callbackURL: process.env.GITHUB_CALLBACK_URL,
+      scope: ["user:email"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -19,7 +20,7 @@ passport.use(
           user = new User({
             githubId: profile.id,
             displayName: profile.displayName,
-            email: profile.emails?.[0]?.value || "No public email",
+            email: profile.emails?.[0]?.value || "",
             profilePicture: profile.photos?.[0]?.value || "",
           });
           await user.save();
