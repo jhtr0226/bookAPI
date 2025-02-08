@@ -9,8 +9,9 @@ const swaggerDocument = require('./swagger.json');
 const errorMiddlerware = require('./middleware/errorMiddleware');
 const session = require("express-session");
 const passport = require('passport');
-require("./passport-config"); // Load GitHub OAuth
+require("./passport-config"); 
 const authRoutes = require("./routes/authRoute");
+const MongoStore = require("connect-mongo");
 
 
 const app = express();
@@ -24,6 +25,15 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URL, 
+      collectionName: "sessions",
+    }),
+    cookie: {
+      secure: process.env.RENDER ? true : false, 
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 app.use(passport.initialize());
