@@ -2,66 +2,46 @@ const passport = require("passport");
 const GitHubStrategy = require("passport-github2").Strategy;
 const mongoose = require("mongoose");
 const User = require("./models/user");
-const axios = require("axios"); // Ensure axios is installed
+const axios = require("axios");
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL,
-      scope: ["user:email"],
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let email = "No email provided";
+const isRender = process.env.RENDER === "true";
 
-        
-        const emailResponse = await axios.get("https://api.github.com/user/emails", {
-          headers: { Authorization: `Bearer ${accessToken}` },
+const CALLBACK_URL = isRender
+  ? "https://bookapi-5sj1.onrender.com/auth/github/callback" 
+  : "http://localhost:3000/auth/github/callback";
+
+
+  
+passport.use(new GitHubStrategy(
+  {
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: CALLBACK_URL,
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      let user = await User.findOne({ githubId: profile.id });
+
+      if (!user) {
+        user = new User({
+          githubId: profile.id,
+          displayName: profile.displayName,
+          email: profile.emails?.[0]?.value || "No public email",
+          profilePicture: profile.photos?.[0]?.value || "",
         });
-
-        if (emailResponse.data.length > 0) {
-          email = emailResponse.data.find(e => e.verified && e.primary)?.email || email;
-        }
-
-        
-        let user = await User.findOne({ email: email });
-
-        if (!user) {
-          user = new User({
-            githubId: profile.id,
-            displayName: profile.displayName || profile.username,
-            email: email,
-            profilePicture: profile.photos?.[0]?.value || null,
-          });
-          await user.save();
-        } else {
-          
-          if (!user.githubId) {
-            user.githubId = profile.id;
-            await user.save();
-          }
-        }
-
-        return done(null, user);
-      } catch (err) {
-        console.error("GitHub OAuth Error:", err);
-        return done(err, null);
+        await user.save();
       }
+      return done(null, user);
+    } catch (err) {
+      return done(err, null);
     }
-  )
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
   }
+));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  const user = await User.findById(id);
+  done(null, user);
 });
+
+module.exports = passport;
