@@ -1,26 +1,29 @@
 const express = require("express");
 const passport = require("passport");
-
 const router = express.Router();
 
-// GitHub OAuth Login Route
+// Redirect to GitHub OAuth login
 router.get("/auth/github", passport.authenticate("github", { scope: ["user:email"] }));
 
-// GitHub OAuth Callback Route
+// Handle GitHub OAuth callback
 router.get(
   "/auth/github/callback",
   passport.authenticate("github", { failureRedirect: "/" }),
   (req, res) => {
-    req.session.user = req.user; // Store session
-    res.redirect("/dashboard"); // Redirect after login
+    console.log("GitHub authentication successful! Redirecting to dashboard...");
+    res.redirect("/dashboard");
   }
 );
 
-// Logout Route
-router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return next(err);
-    res.redirect("/");
+// Logout route
+router.get("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    req.session.destroy(() => {
+      res.redirect("/");
+    });
   });
 });
 
